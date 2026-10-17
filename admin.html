@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>App Ritim Admin</title>
+<link rel="icon" href="ikon.png">
+<!-- Supabase client, bundled next to this page (same file the app ships with) -->
+<script src="supabase.js"></script>
+<style>
+/* App Ritim admin panel. Everything it shows comes from admin_* functions that check the admin role on the server. */
+:root {
+  --bg: #0B0D14; --surface: #151824; --surface-2: #1E2232; --line: rgba(255, 255, 255, 0.1); --ink: #F2F4F6; --muted: #A9B0BC;
+  --gold: #F7DC8C; --acc: #FF8A5C; --water: #5AB0F5; --ok: #5BD69A; --bad: #FF6B6B;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+button, input, textarea, select { font: inherit; color: inherit; }
+[hidden] { display: none !important; }
+.wrap { max-width: 1040px; margin: 0 auto; padding: 16px; }
+header.top { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--line); position: sticky; top: 0; background: rgba(11, 13, 20, 0.92); backdrop-filter: blur(10px); z-index: 5; }
+header.top img { width: 36px; height: 36px; border-radius: 10px; }
+header.top b { font-size: 17px; }
+header.top small { color: var(--muted); }
+header.top .sp { flex: 1; }
+nav.tabs { display: flex; gap: 6px; overflow-x: auto; padding: 12px 16px 0; max-width: 1040px; margin: 0 auto; }
+nav.tabs button { flex: none; padding: 9px 14px; border-radius: 999px; border: 1px solid var(--line); background: none; cursor: pointer; font-weight: 700; color: var(--muted); }
+nav.tabs button[aria-selected="true"] { background: linear-gradient(135deg, #FFB23D, #FF8A5C); color: #161724; border-color: transparent; }
+nav.tabs .cnt { display: inline-block; min-width: 20px; padding: 0 6px; margin-left: 6px; border-radius: 10px; background: var(--bad); color: #fff; font-size: 12px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 16px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+.stat b { display: block; font-size: 28px; font-weight: 800; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.stat span { color: var(--muted); font-size: 13px; }
+h2 { font-size: 17px; margin: 22px 0 10px; }
+.btn { padding: 9px 14px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface-2); cursor: pointer; font-weight: 700; }
+.btn:disabled { opacity: 0.5; cursor: default; }
+.btn.pri { background: linear-gradient(135deg, #FFB23D, #FF8A5C); color: #161724; border-color: transparent; }
+.btn.bad { background: rgba(255, 107, 107, 0.14); border-color: rgba(255, 107, 107, 0.5); color: #FFB3B3; }
+.btn.ok { background: rgba(91, 214, 154, 0.14); border-color: rgba(91, 214, 154, 0.5); color: #A8F0CB; }
+.btn.sm { padding: 6px 10px; font-size: 13px; }
+input[type="text"], input[type="password"], input[type="number"], input[type="search"], textarea { width: 100%; padding: 11px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface-2); }
+textarea { min-height: 80px; resize: vertical; }
+label { display: block; font-weight: 700; font-size: 13px; color: var(--muted); margin: 10px 0 4px; }
+.row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.muted { color: var(--muted); }
+.err { color: #FFB3B3; min-height: 1.4em; }
+.tag { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 12px; font-weight: 700; border: 1px solid var(--line); color: var(--muted); }
+.tag.bad { color: #FFB3B3; border-color: rgba(255, 107, 107, 0.5); }
+.tag.gold { color: var(--gold); border-color: rgba(247, 220, 140, 0.5); }
+.tag.ok { color: #A8F0CB; border-color: rgba(91, 214, 154, 0.5); }
+/* Login */
+.login { max-width: 380px; margin: 10vh auto; text-align: center; }
+.login img { width: 84px; height: 84px; border-radius: 22px; }
+.login h1 { margin: 10px 0 4px; }
+.login form { text-align: left; margin-top: 16px; }
+.login .btn { width: 100%; margin-top: 14px; padding: 12px; }
+/* Signup chart */
+.bars { display: flex; align-items: flex-end; gap: 3px; height: 120px; margin-top: 8px; }
+.bars i { flex: 1; min-width: 4px; background: linear-gradient(180deg, #FF8A5C, #FFB23D); border-radius: 4px 4px 0 0; position: relative; }
+.bars i:hover::after { content: attr(data-t); position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); white-space: nowrap; background: #000; padding: 2px 6px; border-radius: 6px; font-size: 12px; font-style: normal; }
+.top10 { list-style: none; margin: 0; padding: 0; }
+.top10 li { display: flex; gap: 10px; padding: 8px 0; border-top: 1px solid var(--line); }
+.top10 li:first-child { border-top: 0; }
+.top10 .num { margin-left: auto; font-variant-numeric: tabular-nums; font-weight: 700; }
+/* People and reports */
+.list { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+.person { display: flex; gap: 12px; align-items: flex-start; }
+.av { width: 44px; height: 44px; flex: none; border-radius: 50%; display: grid; place-items: center; background: var(--surface-2); font-size: 20px; font-weight: 800; overflow: hidden; }
+.av img { width: 100%; height: 100%; object-fit: cover; }
+.who { flex: 1; min-width: 0; }
+.who b { font-size: 15px; }
+.who .meta { font-size: 13px; color: var(--muted); overflow-wrap: anywhere; }
+.who .bio { font-size: 14px; margin-top: 4px; white-space: pre-line; overflow-wrap: anywhere; }
+.acts { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line); }
+.acts input[type="number"] { width: 72px; padding: 6px 8px; }
+.toggle { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--ink); margin: 0; }
+.ph-big { max-width: 160px; border-radius: 12px; display: block; margin-top: 8px; }
+.pager { display: flex; gap: 8px; justify-content: center; margin-top: 12px; }
+.toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: #000; border: 1px solid var(--line); padding: 10px 16px; border-radius: 12px; z-index: 20; max-width: calc(100% - 32px); }
+</style>
+</head>
+<body>
+
+<section class="login wrap" id="login">
+  <img src="ikon.png" alt="">
+  <h1>App Ritim Admin</h1>
+  <p class="muted">Admin yetkisi olan hesabınla giriş yap.</p>
+  <form id="lf">
+    <label for="lu">Kullanıcı adı veya e-posta</label>
+    <input id="lu" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" required>
+    <label for="lp">Şifre</label>
+    <input id="lp" type="password" autocomplete="current-password" required>
+    <p class="err" id="lerr" role="alert"></p>
+    <button class="btn pri" id="lbtn" type="submit">Giriş yap</button>
+  </form>
+</section>
+
+<div id="app" hidden>
+  <header class="top">
+    <img src="ikon.png" alt="">
+    <div><b>App Ritim Admin</b><br><small id="me"></small></div>
+    <span class="sp"></span>
+    <button class="btn sm" id="refresh">↻ Yenile</button>
+    <button class="btn sm" id="logout">Çıkış</button>
+  </header>
+  <nav class="tabs" role="tablist">
+    <button role="tab" data-tab="stats" aria-selected="true">📊 İstatistikler</button>
+    <button role="tab" data-tab="users" aria-selected="false">👥 Kullanıcılar</button>
+    <button role="tab" data-tab="reports" aria-selected="false">🚨 Şikâyetler<span class="cnt" id="rcnt" hidden></span></button>
+    <button role="tab" data-tab="ann" aria-selected="false">📢 Duyurular</button>
+  </nav>
+  <main class="wrap">
+    <section id="t-stats">
+      <div class="grid" id="sgrid"></div>
+      <h2>Son 30 günde kayıtlar</h2>
+      <div class="card"><div class="bars" id="sbars"></div><p class="muted" id="sbars-sub"></p></div>
+      <h2>Bu haftanın en çok yürüyenleri</h2>
+      <div class="card"><ol class="top10" id="stop"></ol></div>
+      <p class="muted" style="margin-top:16px">Özel mesajların içeriği burada gösterilmez, sadece sayısı. Aktif: son 1 / 7 günde uygulamayı açmış hesaplar.</p>
+    </section>
+
+    <section id="t-users" hidden>
+      <div class="row"><input id="uq" type="search" placeholder="Kullanıcı adı, ad ya da e-posta ara…" style="flex:1"><span class="muted" id="utotal"></span></div>
+      <div class="list" id="ulist"></div>
+      <div class="pager"><button class="btn sm" id="uprev">← Önceki</button><button class="btn sm" id="unext">Sonraki →</button></div>
+    </section>
+
+    <section id="t-reports" hidden>
+      <div class="row"><select id="rstatus" class="btn sm"><option value="open">Açık şikâyetler</option><option value="all">Tümü</option><option value="done">Çözülenler</option><option value="dismissed">Yoksayılanlar</option></select></div>
+      <div class="list" id="rlist"></div>
+    </section>
+
+    <section id="t-ann" hidden>
+      <div class="card">
+        <h2 style="margin-top:0">Yeni duyuru</h2>
+        <p class="muted">Uygulamayı açan herkes (misafirler dahil) Bugün ekranının en üstünde görür. Yeni duyuru öncekinin yerini alır.</p>
+        <div class="row"><div style="width:90px"><label for="ae">Emoji</label><input id="ae" type="text" maxlength="4" value="📢"></div>
+          <div style="flex:1"><label for="at">Başlık</label><input id="at" type="text" maxlength="80" placeholder="ör. Hafta sonu adım yarışı başlıyor! 🏆"></div></div>
+        <label for="ab">Metin</label><textarea id="ab" maxlength="400" placeholder="Kısa bir açıklama (isteğe bağlı)"></textarea>
+        <div class="row" style="margin-top:10px"><label for="ad" style="margin:0">Süre (gün, 0 = süresiz)</label><input id="ad" type="number" min="0" max="90" value="7" style="width:90px">
+          <span class="sp" style="flex:1"></span><button class="btn pri" id="apub">Yayınla</button></div>
+        <p class="err" id="aerr"></p>
+      </div>
+      <h2>Geçmiş duyurular</h2>
+      <div class="list" id="alist"></div>
+    </section>
+  </main>
+</div>
+
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(() => {
+  const SUPA = { url: 'https://rfpkupgxjvlgleqohnql.supabase.co', key: 'sb_publishable_5sJB7W58Yo-RaCmjwqwb_Q_JqfZ6IrZ' };
+  const sb = window.supabase.createClient(SUPA.url, SUPA.key, { auth: { persistSession: true, autoRefreshToken: true, storageKey: 'ritim-admin' } });
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const fmt = n => (+n || 0).toLocaleString('tr-TR');
+  const when = t => t ? new Date(t).toLocaleString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '–';
+  // Shared photos are only ever small JPEG data URLs made by the app; anything else is not shown
+  const safePhoto = v => typeof v === 'string' && v.length < 120000 && /^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(v) ? v : '';
+  const avatar = (emoji, photo, name) => { const ph = safePhoto(photo); return `<span class="av">${ph ? `<img alt="" src="${ph}">` : esc(emoji || String(name || '?').charAt(0).toLocaleUpperCase('tr-TR'))}</span>`; };
+  let toastT;
+  function toast(t) { const el = $('toast'); el.textContent = t; el.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => { el.hidden = true; }, 2800); }
+  async function rpc(name, args) {
+    const { data, error } = await sb.rpc(name, args || {});
+    if (error) { if (/not admin/i.test(error.message)) { await signOut('Bu hesabın admin yetkisi yok.'); } throw error; }
+    return data;
+  }
+
+  // ---- Sign in: a username is turned into the account's email by the server, only with the right password
+  $('lf').addEventListener('submit', async e => {
+    e.preventDefault();
+    const raw = $('lu').value.trim().toLowerCase(), pw = $('lp').value;
+    $('lerr').textContent = ''; $('lbtn').disabled = true; $('lbtn').textContent = 'Giriş yapılıyor…';
+    try {
+      let email = raw;
+      if (!raw.includes('@')) {
+        const r = await sb.rpc('login_email', { un: raw, pw });
+        if (r.error) throw r.error;
+        if (r.data === 'locked') throw new Error('Çok fazla yanlış deneme. 1 saat sonra tekrar dene.');
+        if (!r.data) throw new Error('Kullanıcı adı ya da şifre yanlış.');
+        email = r.data;
+      }
+      const { error } = await sb.auth.signInWithPassword({ email, password: pw });
+      if (error) throw new Error(/invalid/i.test(error.message) ? 'Kullanıcı adı ya da şifre yanlış.' : 'Bağlantı sorunu, tekrar dene.');
+      $('lp').value = '';
+      await enter();
+    } catch (x) { $('lerr').textContent = x.message || 'Bir sorun oldu.'; }
+    finally { $('lbtn').disabled = false; $('lbtn').textContent = 'Giriş yap'; }
+  });
+  async function signOut(msg) {
+    await sb.auth.signOut().catch(() => {});
+    $('app').hidden = true; $('login').hidden = false; $('lerr').textContent = msg || '';
+  }
+  $('logout').addEventListener('click', () => signOut(''));
+  async function enter() {
+    const { data } = await sb.auth.getSession();
+    if (!data.session) { $('login').hidden = false; return; }
+    const ok = await sb.rpc('is_admin');
+    if (ok.error || ok.data !== true) { await signOut('Bu hesabın admin yetkisi yok.'); return; }
+    const m = data.session.user.user_metadata || {};
+    $('me').textContent = '@' + (m.un || '') + ' · admin';
+    $('login').hidden = true; $('app').hidden = false;
+    show(tab);
+  }
+
+  // ---- Tabs
+  let tab = 'stats';
+  document.querySelectorAll('nav.tabs [data-tab]').forEach(b => b.addEventListener('click', () => show(b.dataset.tab)));
+  function show(name) {
+    tab = name;
+    document.querySelectorAll('nav.tabs [data-tab]').forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === name)));
+    ['stats', 'users', 'reports', 'ann'].forEach(n => { $('t-' + n).hidden = n !== name; });
+    ({ stats: loadStats, users: loadUsers, reports: loadReports, ann: loadAnn })[name]().catch(e => toast('Yüklenemedi: ' + (e.message || e)));
+  }
+  $('refresh').addEventListener('click', () => show(tab));
+
+  // ---- Statistics
+  async function loadStats() {
+    const s = await rpc('admin_stats');
+    const cards = [['users', 'toplam kullanıcı'], ['today', 'bugün kayıt'], ['week', 'son 7 gün kayıt'], ['active1', 'aktif (24 saat)'], ['active7', 'aktif (7 gün)'],
+      ['friendships', 'arkadaşlık'], ['groups', 'grup'], ['messages', 'mesaj (sayı)'], ['reports_open', 'açık şikâyet'], ['banned', 'engelli hesap']];
+    $('sgrid').innerHTML = cards.map(([k, l]) => `<div class="card stat"><b>${fmt(s[k])}</b><span>${l}</span></div>`).join('');
+    setReportCount(s.reports_open);
+    const byDay = Object.fromEntries((s.signups || []).map(x => [x.d, x.n])), days = [];
+    for (let i = 29; i >= 0; i--) { const d = new Date(); d.setDate(d.getDate() - i); const k = d.toLocaleDateString('sv-SE', { timeZone: 'Europe/Istanbul' }); days.push([k, byDay[k] || 0]); }
+    const max = Math.max(1, ...days.map(d => d[1]));
+    $('sbars').innerHTML = days.map(([k, n]) => `<i style="height:${Math.max(2, n / max * 100)}%" data-t="${k.slice(5)}: ${n}"></i>`).join('');
+    $('sbars-sub').textContent = `30 günde ${fmt(days.reduce((a, d) => a + d[1], 0))} yeni hesap`;
+    $('stop').innerHTML = (s.top || []).length ? s.top.map((t, i) => `<li><span>${i + 1}.</span><span>${esc(t.n || t.un)} <span class="muted">@${esc(t.un)}</span></span><span class="num">${fmt(t.w)} adım</span></li>`).join('')
+      : '<li class="muted">Bu hafta henüz adım yok.</li>';
+  }
+  function setReportCount(n) { $('rcnt').textContent = n; $('rcnt').hidden = !n; }
+
+  // ---- People
+  let uOff = 0, uTimer;
+  const U_PAGE = 30;
+  $('uq').addEventListener('input', () => { clearTimeout(uTimer); uTimer = setTimeout(() => { uOff = 0; loadUsers().catch(e => toast(e.message)); }, 300); });
+  $('uprev').addEventListener('click', () => { uOff = Math.max(0, uOff - U_PAGE); loadUsers(); });
+  $('unext').addEventListener('click', () => { uOff += U_PAGE; loadUsers(); });
+  async function loadUsers() {
+    const r = await rpc('admin_users', { p_q: $('uq').value.trim(), p_limit: U_PAGE, p_offset: uOff });
+    $('utotal').textContent = `${fmt(r.total)} kişi`;
+    $('uprev').disabled = uOff === 0; $('unext').disabled = uOff + U_PAGE >= r.total;
+    $('ulist').innerHTML = r.rows.length ? r.rows.map(u => {
+      const un = esc(u.un), tags = [u.admin ? '<span class="tag gold">admin</span>' : '', u.banned ? '<span class="tag bad">engelli</span>' : '',
+        u.no_photo ? '<span class="tag bad">foto kaldırıldı</span>' : '', u.no_bio ? '<span class="tag bad">biyo kaldırıldı</span>' : '', u.reset_name ? '<span class="tag bad">ad sıfırlandı</span>' : ''].join(' ');
+      return `<div class="card" data-un="${un}">
+        <div class="person">${avatar(u.emoji, '', u.name || u.un)}
+          <div class="who"><b>${esc(u.name || u.un)}</b> <span class="muted">@${un}</span> ${tags}
+            <div class="meta">${u.email ? esc(u.email) + ' · ' : ''}Katıldı ${when(u.created_at)} · Son görülme ${when(u.seen)}</div>
+            <div class="meta">Bu hafta ${fmt(u.week_steps)} adım · Seviye ${esc(u.lv || '–')} · ${esc(u.badges || 0)} rozet · en iyi seri ${esc(u.best_streak || 0)} gün${u.has_photo ? ' · 📷 fotoğraf herkese açık' : ''}</div>
+            ${u.bio ? `<div class="bio">“${esc(u.bio)}”</div>` : ''}
+          </div></div>
+        ${u.admin ? '' : `<div class="acts">
+          <button class="btn sm ${u.banned ? 'ok' : 'bad'}" data-act="ban" data-v="${u.banned ? 0 : 1}">${u.banned ? '✅ Engeli kaldır' : '⛔ Engelle'}</button>
+          <span class="row"><input type="number" min="1" max="365" value="7" aria-label="VIP gün"><button class="btn sm" data-act="vip">👑 VIP hediye et</button></span>
+          <label class="toggle"><input type="checkbox" data-mod="no_photo" ${u.no_photo ? 'checked' : ''}> Fotoğrafı kaldır</label>
+          <label class="toggle"><input type="checkbox" data-mod="no_bio" ${u.no_bio ? 'checked' : ''}> Biyografiyi kaldır</label>
+          <label class="toggle"><input type="checkbox" data-mod="reset_name" ${u.reset_name ? 'checked' : ''}> Adı sıfırla</label>
+          <span class="sp" style="flex:1"></span>
+          <button class="btn sm bad" data-act="del">🗑️ Hesabı sil</button>
+        </div>`}</div>`;
+    }).join('') : '<p class="muted">Kimse bulunamadı.</p>';
+  }
+  $('ulist').addEventListener('click', async e => {
+    const b = e.target.closest('[data-act]'); if (!b) return;
+    const card = b.closest('[data-un]'), un = card.dataset.un;
+    b.disabled = true;
+    try {
+      if (b.dataset.act === 'ban') {
+        await rpc('admin_set_ban', { p_un: un, p_ban: b.dataset.v === '1' });
+        toast(b.dataset.v === '1' ? `⛔ @${un} engellendi` : `✅ @${un} engeli kaldırıldı`);
+      } else if (b.dataset.act === 'vip') {
+        const days = Math.round(+b.previousElementSibling.value);
+        const r = await rpc('admin_gift_vip', { p_un: un, p_days: days });
+        toast(r === 'ok' ? `👑 @${un} kişisine ${days} gün VIP gönderildi` : 'Gönderilemedi: ' + r);
+      } else if (b.dataset.act === 'del') {
+        // Two taps: the first one asks
+        if (!b.dataset.sure) { b.dataset.sure = '1'; b.textContent = '⚠️ Emin misin? Tekrar dokun'; b.disabled = false; setTimeout(() => { delete b.dataset.sure; b.textContent = '🗑️ Hesabı sil'; }, 4000); return; }
+        const r = await rpc('admin_delete_user', { p_un: un });
+        toast(r === 'ok' ? `🗑️ @${un} silindi` : 'Silinemedi: ' + r);
+      }
+      await loadUsers();
+    } catch (x) { toast('Hata: ' + (x.message || x)); b.disabled = false; }
+  });
+  $('ulist').addEventListener('change', async e => {
+    const c = e.target.closest('[data-mod]'); if (!c) return;
+    const card = c.closest('[data-un]'), un = card.dataset.un, get = k => card.querySelector(`[data-mod="${k}"]`).checked;
+    try {
+      await rpc('admin_set_mod', { p_un: un, p_no_photo: get('no_photo'), p_no_bio: get('no_bio'), p_reset_name: get('reset_name') });
+      toast('Kaydedildi'); await loadUsers();
+    } catch (x) { toast('Hata: ' + (x.message || x)); c.checked = !c.checked; }
+  });
+
+  // ---- Reports
+  const KIND = { name: 'Uygunsuz ad', photo: 'Uygunsuz fotoğraf', bio: 'Uygunsuz biyografi', user: 'Taciz / spam / diğer' };
+  const ACTION = { dismiss: 'yoksayıldı', photo: 'fotoğraf kaldırıldı', bio: 'biyografi kaldırıldı', name: 'ad sıfırlandı', ban: 'hesap engellendi' };
+  $('rstatus').addEventListener('change', () => loadReports());
+  async function loadReports() {
+    const list = await rpc('admin_reports', { p_status: $('rstatus').value });
+    if ($('rstatus').value === 'open') setReportCount(list.length);
+    $('rlist').innerHTML = list.length ? list.map(r => {
+      const ph = safePhoto(r.photo);
+      return `<div class="card" data-rid="${+r.id}">
+        <div class="person">${avatar(r.emoji, r.photo, r.name || r.target)}
+          <div class="who"><b>${esc(r.name || r.target)}</b> <span class="muted">@${esc(r.target)}</span> <span class="tag bad">${esc(KIND[r.kind] || r.kind)}</span>
+            ${r.open_for_target > 1 ? `<span class="tag bad">${+r.open_for_target} açık şikâyet</span>` : ''} ${r.status !== 'open' ? `<span class="tag ok">${esc(ACTION[r.action] || r.status)}</span>` : ''}
+            <div class="meta">@${esc(r.reporter)} bildirdi · ${when(r.created_at)}</div>
+            ${r.reason ? `<div class="bio">Açıklama: “${esc(r.reason)}”</div>` : ''}
+            ${r.kind === 'bio' || r.bio ? `<div class="bio muted">Biyografi: ${r.bio ? '“' + esc(r.bio) + '”' : '(boş)'}</div>` : ''}
+            ${ph ? `<img class="ph-big" alt="Bildirilen fotoğraf" src="${ph}">` : r.kind === 'photo' ? '<div class="meta">Fotoğraf artık herkese açık değil.</div>' : ''}
+            ${r.name === null && r.status === 'open' ? '<div class="meta">Bu profil artık yok (silinmiş ya da engellenmiş).</div>' : ''}
+          </div></div>
+        ${r.status === 'open' ? `<div class="acts">
+          <button class="btn sm" data-ract="dismiss">Yoksay</button>
+          ${r.kind === 'photo' ? '<button class="btn sm bad" data-ract="photo">Fotoğrafı kaldır</button>' : ''}
+          ${r.kind === 'bio' ? '<button class="btn sm bad" data-ract="bio">Biyografiyi kaldır</button>' : ''}
+          ${r.kind === 'name' ? '<button class="btn sm bad" data-ract="name">Adı sıfırla</button>' : ''}
+          <button class="btn sm bad" data-ract="ban">⛔ Hesabı engelle</button>
+        </div>` : ''}</div>`;
+    }).join('') : '<p class="muted">Burada şikâyet yok. 🎉</p>';
+  }
+  $('rlist').addEventListener('click', async e => {
+    const b = e.target.closest('[data-ract]'); if (!b) return;
+    const id = +b.closest('[data-rid]').dataset.rid;
+    b.disabled = true;
+    try { await rpc('admin_resolve_report', { p_id: id, p_action: b.dataset.ract }); toast('✅ ' + (ACTION[b.dataset.ract] || 'tamam')); await loadReports(); }
+    catch (x) { toast('Hata: ' + (x.message || x)); b.disabled = false; }
+  });
+
+  // ---- Announcements
+  async function loadAnn() {
+    const list = await rpc('admin_announcements');
+    const now = Date.now();
+    $('alist').innerHTML = list.length ? list.map(a => {
+      const live = a.active && (!a.until || new Date(a.until) > now);
+      return `<div class="card" data-aid="${+a.id}"><div class="person"><span class="av">${esc(a.emoji)}</span><div class="who"><b>${esc(a.title)}</b>
+        ${live ? '<span class="tag ok">yayında</span>' : '<span class="tag">bitti</span>'}
+        <div class="meta">${when(a.created_at)}${a.until ? ' · bitiş ' + when(a.until) : ' · süresiz'}</div>${a.body ? `<div class="bio">${esc(a.body)}</div>` : ''}</div>
+        ${live ? '<button class="btn sm bad" data-aend>Bitir</button>' : ''}</div></div>`;
+    }).join('') : '<p class="muted">Henüz duyuru yok.</p>';
+  }
+  $('apub').addEventListener('click', async () => {
+    const title = $('at').value.trim();
+    $('aerr').textContent = title ? '' : 'Başlık yaz.';
+    if (!title) return;
+    $('apub').disabled = true;
+    try {
+      await rpc('admin_announce', { p_emoji: $('ae').value.trim() || '📢', p_title: title, p_body: $('ab').value.trim(), p_days: Math.max(0, Math.round(+$('ad').value || 0)) });
+      $('at').value = ''; $('ab').value = ''; toast('📢 Duyuru yayında'); await loadAnn();
+    } catch (x) { $('aerr').textContent = 'Hata: ' + (x.message || x); }
+    finally { $('apub').disabled = false; }
+  });
+  $('alist').addEventListener('click', async e => {
+    const b = e.target.closest('[data-aend]'); if (!b) return;
+    b.disabled = true;
+    try { await rpc('admin_end_announcement', { p_id: +b.closest('[data-aid]').dataset.aid }); toast('Duyuru bitirildi'); await loadAnn(); }
+    catch (x) { toast('Hata: ' + (x.message || x)); b.disabled = false; }
+  });
+
+  enter();
+})();
+</script>
+</body>
+</html>
