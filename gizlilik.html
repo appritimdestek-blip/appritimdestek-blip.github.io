@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>App Ritim · Gizlilik Politikası</title>
+<style>
+:root { --bg: #FFFFFF; --ink: #17181B; --muted: #555B66; --line: #E2E5EA; --acc: #C2410C; }
+@media (prefers-color-scheme: dark) { :root { --bg: #111318; --ink: #EEF0F3; --muted: #A9B0BA; --line: #2A2E36; --acc: #FF8A5C; } }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif; }
+main { max-width: 720px; margin: 0 auto; padding: 32px 16px 64px; }
+h1 { font-size: 28px; line-height: 1.2; margin: 0 0 4px; }
+h2 { font-size: 19px; margin: 32px 0 8px; padding-top: 16px; border-top: 1px solid var(--line); }
+p, li { color: var(--ink); }
+.muted { color: var(--muted); font-size: 14px; }
+ul { padding-left: 20px; }
+li { margin: 4px 0; }
+a { color: var(--acc); }
+</style>
+</head>
+<body>
+<main>
+<h1>App Ritim Gizlilik Politikası</h1>
+<p class="muted">Son güncelleme: 17 Ekim 2026</p>
+
+<p>App Ritim; adım, su ve uyku alışkanlıklarını takip etmene, arkadaşlarınla yarışmana yardım eden bir uygulamadır. Bu metin hangi bilgileri neden kullandığımızı, nerede sakladığımızı ve kimlerle paylaştığımızı açıklar. Sorularını <a href="mailto:appritim.destek@gmail.com">appritim.destek@gmail.com</a> adresine yazabilirsin.</p>
+
+<h2>1. Sadece telefonunda kalan bilgiler</h2>
+<p>Aşağıdakiler yalnızca telefonunda saklanır, bize gönderilmez:</p>
+<ul>
+  <li>Günlük adım sayıların, içtiğin su, uyku kayıtların, ruh hâli kayıtların ve alarmların</li>
+  <li>Kilon, boyun, cinsiyetin, hedefin ve günlük hedeflerin</li>
+  <li>Biyografin ve fotoğrafın (paylaşmayı seçmediğin sürece)</li>
+</ul>
+<p>Uygulamayı silersen bu bilgiler de telefonundan silinir.</p>
+
+<h2>2. Hesap açarsan sunucuda tutulanlar</h2>
+<p>Hesap açmak isteğe bağlıdır; uygulamayı hesapsız (misafir olarak) da kullanabilirsin. Hesap açarsan şunlar sunucumuzda saklanır:</p>
+<ul>
+  <li><b>Hesap bilgileri:</b> kullanıcı adın, adın, şifrenin geri çevrilemez şekilde şifrelenmiş (hash) hâli ve eklediysen e-posta adresin</li>
+  <li><b>Herkese açık profil kartın:</b> adın, emojin, seviyen, rozetlerin, en uzun serin ve bu haftaki toplam adım sayın. "Herkes görsün" seçersen biyografin ve fotoğrafın da kartında görünür.</li>
+  <li><b>Sosyal özellikler:</b> arkadaşlıkların, arkadaşlarınla yazıştığın mesajlar, beğeniler, dürtmeler, davetler ve katıldığın grup meydan okumaları</li>
+</ul>
+<p>Sunucumuz <b>Supabase</b> altyapısında, Avrupa Birliği içinde (<b>Frankfurt, Almanya</b>) çalışır. Bağlantılar şifrelidir (HTTPS).</p>
+
+<h2>3. İzinler ve neden istendikleri</h2>
+<ul>
+  <li><b>Fiziksel aktivite (adım sayar):</b> Telefonunun hareket sensöründen adımlarını saymak için. Sayım telefonunda yapılır.</li>
+  <li><b>Konum:</b> Yalnızca ana ekrandaki hava durumu için. Yaklaşık konumun (yaklaşık 100 metre hassasiyetle) hava durumunu ve şehir adını öğrenmek için Open-Meteo ve BigDataCloud servislerine gönderilir. Konumun sunucumuzda saklanmaz. İzin vermezsen hava durumu görünmez, uygulamanın geri kalanı çalışır.</li>
+  <li><b>Bildirimler ve alarmlar:</b> Su hatırlatmaları, yatma saati hatırlatmaları ve uyandırma alarmları için. Bunlar telefonunda kurulur.</li>
+</ul>
+
+<h2>4. Reklamlar</h2>
+<p>Uygulama ücretsizdir ve <b>Google AdMob</b> reklamları gösterir. AdMob, reklam göstermek ve ölçmek için cihazının reklam kimliğini ve bazı cihaz bilgilerini kullanabilir. Ayrıntılar için <a href="https://policies.google.com/technologies/ads?hl=tr">Google'ın reklam politikasına</a> bakabilirsin. Kişiselleştirilmiş reklamları telefonunun ayarlarından (Google → Reklamlar) kapatabilirsin.</p>
+
+<h2>5. Bilgilerin kimlerle paylaşılır</h2>
+<ul>
+  <li><b>Arkadaşların ve diğer kullanıcılar:</b> Yalnızca yukarıda anlatılan profil kartın; mesajlarını sadece yazıştığın kişi görür.</li>
+  <li><b>Hizmet sağlayıcılarımız:</b> Supabase (sunucu ve hesaplar), Google AdMob (reklamlar), Gmail (şifre sıfırlama e-postaları), Open-Meteo ve BigDataCloud (hava durumu).</li>
+</ul>
+<p>Bilgilerini <b>satmayız</b>.</p>
+
+<h2 id="hesap-silme">6. Hesabını ve verilerini silme</h2>
+<p>Hesabını istediğin zaman uygulamanın içinden silebilirsin: <b>Profil → Güvenlik → Hesabımı sil</b>. Bu işlem hesabını, profil kartını, arkadaşlıklarını, mesajlarını, beğenilerini, dürtmelerini, davetlerini ve grup kayıtlarını sunucumuzdan kalıcı olarak siler.</p>
+<p>Uygulamaya erişemiyorsan, kullanıcı adını yazarak <a href="mailto:appritim.destek@gmail.com?subject=Hesap%20silme">appritim.destek@gmail.com</a> adresinden silme isteği gönderebilirsin; hesabın 30 gün içinde silinir.</p>
+<p>Telefonundaki adım, su ve uyku kayıtlarını <b>Ayarlar → Tüm verileri sil</b> ile ya da uygulamayı kaldırarak silebilirsin.</p>
+
+<h2>7. Saklama süresi</h2>
+<p>Hesap bilgilerini hesabın açık olduğu sürece saklarız. Hesabını sildiğinde sunucudaki bilgilerin hemen silinir.</p>
+
+<h2>8. Çocuklar</h2>
+<p>App Ritim 13 yaşından küçük çocuklara yönelik değildir ve onlardan bilerek bilgi toplamaz.</p>
+
+<h2>9. Hakların</h2>
+<p>6698 sayılı Kişisel Verilerin Korunması Kanunu (KVKK) ve Avrupa Birliği Genel Veri Koruma Tüzüğü (GDPR) kapsamında bilgilerine erişme, düzeltme, silme ve işlenmesine itiraz etme hakların vardır. Bunun için <a href="mailto:appritim.destek@gmail.com">appritim.destek@gmail.com</a> adresine yazabilirsin.</p>
+
+<h2>10. Değişiklikler</h2>
+<p>Bu politikayı güncellersek tarihini değiştirir ve önemli değişiklikleri uygulama içinde duyururuz.</p>
+</main>
+</body>
+</html>
