@@ -2317,6 +2317,18 @@ section.tab-anim > div > *:nth-child(n+7) { animation-delay: 300ms; }
       <div class="bprog"><i id="lv-bar" style="background:var(--gold-1)"></i></div>
       <p class="sub" id="lv-sub"></p>
     </div>
+    <div class="card bd-card">
+      <h2>🏆 Başarıların</h2>
+      <div class="bd-row" id="pf-bd-row"></div>
+      <div class="stats">
+        <div class="stat"><b id="pf-total">0</b><span>toplam adım</span></div>
+        <div class="stat"><b id="pf-km">0</b><span>km yürüdün</span></div>
+        <div class="stat"><b id="pf-best">0</b><span>en uzun seri</span></div>
+        <div class="stat"><b id="pf-perfect">0</b><span>mükemmel gün</span></div>
+        <div class="stat"><b id="pf-wdays">0</b><span>su hedefi günü</span></div>
+        <div class="stat"><b id="pf-nights">0</b><span>uyku kaydı</span></div>
+      </div>
+    </div>
     <div id="bs-list" style="display:flex;flex-direction:column;gap:18px"></div>
   </div>
 </div>
@@ -2339,25 +2351,17 @@ section.tab-anim > div > *:nth-child(n+7) { animation-delay: 300ms; }
       </div>
       <button class="btn btn-ghost" id="pf-edit">Bilgilerimi düzenle</button>
     </div>
-    <div class="card bd-card">
-      <div class="card-head"><h2>🏆 Başarıların</h2><button class="lg-link" id="pf-bd-all">Tüm rozetler ›</button></div>
-      <div class="bd-row" id="pf-bd-row"></div>
-      <div class="stats">
-        <div class="stat"><b id="pf-total">0</b><span>toplam adım</span></div>
-        <div class="stat"><b id="pf-km">0</b><span>km yürüdün</span></div>
-        <div class="stat"><b id="pf-best">0</b><span>en uzun seri</span></div>
-        <div class="stat"><b id="pf-perfect">0</b><span>mükemmel gün</span></div>
-        <div class="stat"><b id="pf-wdays">0</b><span>su hedefi günü</span></div>
-        <div class="stat"><b id="pf-nights">0</b><span>uyku kaydı</span></div>
-      </div>
-      <button class="btn btn-ghost" id="pf-badges">⭐ Rozetlerimi gör</button>
-    </div>
     <div class="card qs-card">
       <div class="card-head"><h2>🎯 Görevler</h2><span class="sub num" id="qs-count"></span></div>
       <p class="sub">Görevleri tamamla, ücretsiz avatar, çerçeve ve isim rengi kazan.</p>
       <ul class="qs-list" id="qs-list"></ul>
       <button class="btn btn-ghost" id="qs-more">Tüm görevleri gör</button>
     </div>
+    <button class="card br-entry" id="pf-badges">
+      <span class="br-entry-ico" aria-hidden="true">🏆</span>
+      <span class="ctext"><b>Başarıların ve rozetler</b><small id="pf-ach-sub"></small></span>
+      <span class="chev-r" aria-hidden="true">›</span>
+    </button>
     <button class="card br-entry rate-entry" id="pf-rate">
       <span class="br-entry-ico rate-ico" aria-hidden="true">⭐</span>
       <span class="ctext"><b>App Ritim'i puanla</b><small id="pf-rate-sub">Beğendiysen birkaç yıldız bizi çok mutlu eder</small></span>
@@ -4198,7 +4202,19 @@ section.tab-anim > div > *:nth-child(n+7) { animation-delay: 300ms; }
     LEVELS.forEach((l, i) => { if (got >= l[0]) lv = i; });
     return { got, lv };
   }
+  // Achievements on the badges sheet: chosen showcase badges and lifetime totals
+  function renderAchStats() {
+    const total = totalSteps();
+    renderShowcase($('pf-bd-row'), myBadgeIds(), true);
+    $('pf-total').textContent = fmt(total);
+    $('pf-km').textContent = (total * S.stride / 100000).toLocaleString('tr-TR', { maximumFractionDigits: 1 });
+    $('pf-best').textContent = streakInfo().best + ' gün';
+    $('pf-perfect').textContent = perfectDays();
+    $('pf-wdays').textContent = waterDays();
+    $('pf-nights').textContent = sleepLogs().length;
+  }
   function renderBadgesSheet() {
+    renderAchStats();
     const { progs } = badgeState(), { got, lv } = levelInfo();
     const nxt = LEVELS[lv + 1];
     $('lv-n').textContent = lv + 1; $('lv-title').textContent = LEVELS[lv][1];
@@ -4247,7 +4263,6 @@ section.tab-anim > div > *:nth-child(n+7) { animation-delay: 300ms; }
     setInitial($('pf-av'));
     $('pf-av').className = 'pf-av' + frmCls(myFrame());
     renderFrames(); renderNameColors(); renderBgPicker(); renderUiPicker(); renderIconPicker(); renderBadgePicker(); applyVip();
-    renderShowcase($('pf-bd-row'), myBadgeIds(), true);
     renderQuests();
     $('pf-name').innerHTML = nmHtml({ n: (p && p.name) || 'Profilim', nc: myNameColor() }) + vipTag({ fm: myFrame() });
     $('pf-level').textContent = `Seviye ${lv + 1} · ${LEVELS[lv][1]} · ${got}/${BADGES.length} rozet`;
@@ -4258,12 +4273,7 @@ section.tab-anim > div > *:nth-child(n+7) { animation-delay: 300ms; }
     const bmi = p && p.w && p.h ? p.w / Math.pow(p.h / 100, 2) : 0;
     $('pf-bmi').textContent = bmi ? bmi.toLocaleString('tr-TR', { maximumFractionDigits: 1 }) : '–';
     $('pf-bmi-l').textContent = bmi ? 'VKİ · ' + bmiLabel(bmi) : 'VKİ';
-    $('pf-total').textContent = fmt(total);
-    $('pf-km').textContent = (total * S.stride / 100000).toLocaleString('tr-TR', { maximumFractionDigits: 1 });
-    $('pf-best').textContent = streakInfo().best + ' gün';
-    $('pf-perfect').textContent = perfectDays();
-    $('pf-wdays').textContent = waterDays();
-    $('pf-nights').textContent = sleepLogs().length;
+    $('pf-ach-sub').textContent = `${got}/${BADGES.length} rozet · ${fmt(total)} adım · en uzun seri ${streakInfo().best} gün`;
     $('pf-g-steps').textContent = fmt(S.goals.steps) + ' adım';
     $('pf-g-water').textContent = fmt(S.goals.water) + ' ml';
     $('pf-g-sleep').textContent = `${S.sleep.bed} – ${S.sleep.wake} · ${fmtDur(spanMin(S.sleep.bed, S.sleep.wake))}`;
@@ -5989,7 +5999,6 @@ section.tab-anim > div > *:nth-child(n+7) { animation-delay: 300ms; }
   $('pf-close').addEventListener('click', () => { $('profile-sheet').hidden = true; });
   $('pf-edit').addEventListener('click', () => { $('profile-sheet').hidden = true; openOnboard(true); });
   $('pf-badges').addEventListener('click', () => { $('profile-sheet').hidden = true; openBadges(); });
-  $('pf-bd-all').addEventListener('click', () => { $('profile-sheet').hidden = true; openBadges(); });
 
   function renderBento() {
     const now = new Date(), today = now.getDate(), goal = S.goals.steps;
