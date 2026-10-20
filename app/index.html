@@ -5069,8 +5069,16 @@ section.tab-anim > div > *:nth-child(n+7) { animation-delay: 300ms; }
     if (!acct) { openLogin('in'); return; }
     stopSync(); acct = null; keep.set(null); renderProfile();
     if (db && db.supa) db.supa.auth.signOut().catch(() => {});
+    backToStart();
     toast('Çıkış yapıldı. Verilerin bu cihazda duruyor', 2600);
   });
+  // After signing out (or deleting the account) the welcome choice comes back: sign up, sign in or carry on as a guest
+  function backToStart() {
+    document.querySelectorAll('.sheet').forEach(s => { s.hidden = true; });
+    show('today');
+    S.guestOk = false; save();
+    maybeShowStart();
+  }
   // Delete my account (Google Play requires it in the app): the server removes everything the account shared,
   // then the phone signs out; steps, water and sleep stay on the phone
   $('pf-del').addEventListener('click', () => { $('del-err').textContent = ''; $('del-confirm').hidden = false; $('del-no').focus(); });
@@ -5084,7 +5092,7 @@ section.tab-anim > div > *:nth-child(n+7) { animation-delay: 300ms; }
       if (r.error || r.data !== 'ok') throw r.error || new Error(r.data);
       stopSync(); acct = null; keep.set(null);
       await db.supa.auth.signOut({ scope: 'local' }).catch(() => {});
-      $('del-confirm').hidden = true; renderProfile();
+      $('del-confirm').hidden = true; renderProfile(); backToStart();
       toast('🗑️ Hesabın silindi. Adım, su ve uyku kayıtların bu telefonda duruyor', 3600);
     } catch (e) {
       cloudErr(e);
