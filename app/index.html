@@ -668,6 +668,7 @@ section.tab-anim > div > *:nth-child(n+7) { animation-delay: 300ms; }
 .choice .ico { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: var(--surface-2); font-size: 20px; flex: none; }
 .choice[aria-pressed="true"] { border-color: var(--water); background: var(--water-soft); }
 /* Gender choices: a drawn avatar each, their own colours, a pop and a tick when picked, and a welcome line */
+.wr-remind { margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.08); }
 .choice.gx { position: relative; overflow: hidden; padding: 12px 14px; }
 .choice.gx .ctext { flex: 1; display: flex; flex-direction: column; gap: 2px; }
 .choice.gx .ctext small { font-size: 13px; font-weight: 600; color: var(--muted); }
@@ -1646,6 +1647,20 @@ section.tab-anim > div > *:nth-child(n+7) { animation-delay: 300ms; }
         <div class="drinks" id="drinks"></div>
         <p class="sub" id="water-nudge"></p>
         <ul class="log" id="water-log"></ul>
+        <!-- The water reminder lives with the water card (it used to be in Settings) -->
+        <div class="wr-remind">
+          <label class="switch" for="sw-water">Su içmeyi hatırlat<input id="sw-water" type="checkbox"></label>
+          <div class="inline-field">
+            <label for="in-every">Ne sıklıkla?</label>
+            <select id="in-every">
+              <option value="60">Her 1 saatte</option>
+              <option value="90">Her 1,5 saatte</option>
+              <option value="120">Her 2 saatte</option>
+              <option value="180">Her 3 saatte</option>
+            </select>
+          </div>
+          <p class="sub" id="water-window"></p>
+        </div>
       </div>
 
       <div class="card">
@@ -2065,20 +2080,6 @@ section.tab-anim > div > *:nth-child(n+7) { animation-delay: 300ms; }
           <span class="hint" id="gfx-q-hint"></span>
         </div>
       </div>
-      <div class="card">
-        <h2>Su hatırlatıcısı</h2>
-        <label class="switch" for="sw-water">Su içmeyi hatırlat<input id="sw-water" type="checkbox"></label>
-        <div class="inline-field">
-          <label for="in-every">Ne sıklıkla?</label>
-          <select id="in-every">
-            <option value="60">Her 1 saatte</option>
-            <option value="90">Her 1,5 saatte</option>
-            <option value="120">Her 2 saatte</option>
-            <option value="180">Her 3 saatte</option>
-          </select>
-        </div>
-        <p class="sub" id="water-window"></p>
-      </div>
       <div class="card" id="wr-card">
         <div class="card-head"><h2>Giyilebilir cihazlar</h2><span class="sub status ok" id="wr-count"></span></div>
         <p class="sub">Saatini ya da bilekliğini bağla, adım, uyku ve nabız verilerin otomatik gelsin.</p>
@@ -2328,6 +2329,12 @@ section.tab-anim > div > *:nth-child(n+7) { animation-delay: 300ms; }
         <div class="stat"><b id="pf-nights">0</b><span>uyku kaydı</span></div>
       </div>
     </div>
+    <div class="card qs-card">
+      <div class="card-head"><h2>🎯 Görevler</h2><span class="sub num" id="qs-count"></span></div>
+      <p class="sub">Görevleri tamamla, ücretsiz avatar, çerçeve ve isim rengi kazan.</p>
+      <ul class="qs-list" id="qs-list"></ul>
+      <button class="btn btn-ghost" id="qs-more">Tüm görevleri gör</button>
+    </div>
     <div id="bs-list" style="display:flex;flex-direction:column;gap:18px"></div>
   </div>
 </div>
@@ -2350,15 +2357,9 @@ section.tab-anim > div > *:nth-child(n+7) { animation-delay: 300ms; }
       </div>
       <button class="btn btn-ghost" id="pf-edit">Bilgilerimi düzenle</button>
     </div>
-    <div class="card qs-card">
-      <div class="card-head"><h2>🎯 Görevler</h2><span class="sub num" id="qs-count"></span></div>
-      <p class="sub">Görevleri tamamla, ücretsiz avatar, çerçeve ve isim rengi kazan.</p>
-      <ul class="qs-list" id="qs-list"></ul>
-      <button class="btn btn-ghost" id="qs-more">Tüm görevleri gör</button>
-    </div>
     <button class="card br-entry" id="pf-badges">
       <span class="br-entry-ico" aria-hidden="true">🏆</span>
-      <span class="ctext"><b>Başarıların ve rozetler</b><small id="pf-ach-sub"></small></span>
+      <span class="ctext"><b>Başarılar, rozetler ve görevler</b><small id="pf-ach-sub"></small></span>
       <span class="chev-r" aria-hidden="true">›</span>
     </button>
     <button class="card br-entry rate-entry" id="pf-rate">
@@ -2420,7 +2421,7 @@ section.tab-anim > div > *:nth-child(n+7) { animation-delay: 300ms; }
           <span class="fold-ico" aria-hidden="true">🎨</span><span class="ctext"><b>İsim rengi</b><small id="nc-sum"></small></span><span class="chev" aria-hidden="true"></span>
         </button>
         <div class="fold-body" id="fold-nc" hidden>
-          <p class="sub">Arkadaşların adını bu renkte görür: sıralamada, sohbette ve profilinde. ✨ olanlar hareketli. 🔒 olanlar görevle ücretsiz açılır (Profil → 🎯 Görevler). 👑 olanlar VIP'e özel. İkisini de reklam izleyip 24 saat deneyebilirsin.</p>
+          <p class="sub">Arkadaşların adını bu renkte görür: sıralamada, sohbette ve profilinde. ✨ olanlar hareketli. 🔒 olanlar görevle ücretsiz açılır (Profil → Başarılar, rozetler ve görevler). 👑 olanlar VIP'e özel. İkisini de reklam izleyip 24 saat deneyebilirsin.</p>
           <div class="nc-grid" id="nc-grid" role="radiogroup" aria-label="İsim rengi"></div>
         </div>
       </div>
@@ -2822,7 +2823,7 @@ section.tab-anim > div > *:nth-child(n+7) { animation-delay: 300ms; }
     </div>
     <div class="card" id="ib-guest" hidden>
       <h2>Önce giriş yap</h2>
-      <p class="sub">Arkadaşlarınla mesajlaşmak için bir kullanıcı adın olmalı.</p>
+      <p class="sub">Mesajlaşmak için kayıt olman gerekiyor. Kayıtlı herkes birbirine mesaj yazabilir.</p>
       <button class="btn btn-water" id="ib-login">Giriş yap / Kayıt ol</button>
     </div>
     <div class="fr-main" id="ib-main">
@@ -3286,6 +3287,7 @@ section.tab-anim > div > *:nth-child(n+7) { animation-delay: 300ms; }
 
   function renderToday() {
     applyGoalUi();
+    renderWaterRemind();
     const now = new Date();
     const h = now.getHours();
     renderGreeting(now);
@@ -4214,6 +4216,7 @@ section.tab-anim > div > *:nth-child(n+7) { animation-delay: 300ms; }
   }
   function renderBadgesSheet() {
     renderAchStats();
+    renderQuests();
     const { progs } = badgeState(), { got, lv } = levelInfo();
     const nxt = LEVELS[lv + 1];
     $('lv-n').textContent = lv + 1; $('lv-title').textContent = LEVELS[lv][1];
@@ -4578,6 +4581,8 @@ section.tab-anim > div > *:nth-child(n+7) { animation-delay: 300ms; }
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') pushMe(); });
   // Declared as functions so badge checks during start-up can already call them
   function friendIds() { return acct ? links.filter(l => l.status === 'accepted').map(l => l.from === acct.un ? l.to : l.from) : []; }
+  // Any two signed-up people may message each other: friends plus everyone I already have a conversation with
+  function chatIds() { return acct ? [...new Set([...friendIds(), ...Object.keys(chats).map(id => id.split('+').find(u => u !== acct.un)).filter(Boolean)])] : []; }
   function incoming() { return acct ? links.filter(l => l.status === 'pending' && l.to === acct.un) : []; }
   function outgoing() { return acct ? links.filter(l => l.status === 'pending' && l.from === acct.un) : []; }
   function linkWith(un) { return links.find(l => l.from === un || l.to === un); }
@@ -5162,7 +5167,7 @@ section.tab-anim > div > *:nth-child(n+7) { animation-delay: 300ms; }
         <span class="fr-steps"><b class="num">${r.old ? '–' : fmt(r.w)}</b><small>adım</small></span>
         ${r.me ? '' : `<button class="x" data-fr-chat="${esc(r.un)}" aria-label="${esc(r.n)} kişisine mesaj yaz">💬</button><button class="x" data-poke="${esc(r.un)}" aria-label="${esc(r.n)} kişisini dürt">👟</button>`}</li>`;
     }).join('') + (rows.length === 1 ? '<li><p class="empty">Henüz arkadaşın yok. Aşağıdan kullanıcı adıyla ara ya da kendi kullanıcı adını paylaş.</p></li>' : '');
-    const convs = friendIds().map(un => ({ un, c: chats[pairId(acct.un, un)] })).filter(x => x.c && x.c.last && typeof x.c.last.text === 'string')
+    const convs = chatIds().map(un => ({ un, c: chats[pairId(acct.un, un)] })).filter(x => x.c && x.c.last && typeof x.c.last.text === 'string')
       .sort((a, b) => (+b.c.last.at || 0) - (+a.c.last.at || 0));
     $('fr-chats-card').hidden = !convs.length;
     $('fr-chats').innerHTML = convs.map(({ un, c }) => {
@@ -5428,7 +5433,7 @@ section.tab-anim > div > *:nth-child(n+7) { animation-delay: 300ms; }
     const id = pairId(acct.un, un), l = chats[id] && chats[id].last;
     return !!(l && l.from !== acct.un && (+l.at || 0) > (readMap()[id] || 0));
   }
-  function unreadCount() { return friendIds().filter(isUnread).length; }
+  function unreadCount() { return chatIds().filter(isUnread).length; }
   function yday() { const d = new Date(); d.setDate(d.getDate() - 1); return dk(d); }
   // A message streak is alive if its last shared day was today, or yesterday (then it ends tonight unless you both write)
   function chatStreak(un) {
@@ -5473,16 +5478,16 @@ section.tab-anim > div > *:nth-child(n+7) { animation-delay: 300ms; }
     const inc = incoming().length;
     $('ib-req').hidden = !inc;
     $('ib-req').innerHTML = `<span class="fold-ico" aria-hidden="true">📩</span><span class="ctext"><b>${inc} arkadaşlık isteği</b><small>Kabul etmek için dokun</small></span><span class="chev-r" aria-hidden="true">›</span>`;
-    // Every friend, the latest conversation first; friends you haven't written to yet come last
+    // Every friend and everyone I have talked to, the latest conversation first; friends you haven't written to yet come last
     const last = c => (c && c.last && +c.last.at) || 0;
-    const rows = friendIds().map(un => ({ un, c: chats[pairId(acct.un, un)] })).sort((a, b) => last(b.c) - last(a.c));
+    const rows = chatIds().map(un => ({ un, c: chats[pairId(acct.un, un)] })).sort((a, b) => last(b.c) - last(a.c));
     $('ib-list').innerHTML = rows.length ? rows.map(({ un, c }) => {
       const p = cardOf(un), l = c && c.last && typeof c.last.text === 'string' ? c.last : null, nu = isUnread(un);
       return `<li class="fr-row chat-row${nu ? ' unread' : ''}" data-fr-chat="${esc(un)}" role="button" tabindex="0" aria-label="${esc(p.n)} ile sohbet${nu ? ', yeni mesaj' : ''}">
         <span class="fr-av${frmCls(p.fm)}">${avHtml(p)}</span>
         <span class="ctext"><b>${nmHtml(p)}${vipTag(p)}${streakTag(un)}</b><small>${l ? (l.from === acct.un ? 'Sen: ' : '') + esc(l.text.slice(0, 80)) : 'Henüz mesaj yok'}</small></span>
         ${nu ? '<span class="unread-n">Yeni</span>' : l ? `<small class="fr-state">${ago(+l.at || 0)}</small>` : '<span class="ib-start">Yaz ›</span>'}</li>`;
-    }).join('') : '<li><p class="empty">Henüz arkadaşın yok. Aşağıdan arkadaş ekle, sonra buradan mesajlaş.</p></li>';
+    }).join('') : '<li><p class="empty">Henüz sohbetin yok. Birinin profilinde 💬 Mesaj yaz düğmesine dokun ya da aşağıdan arkadaş ekle.</p></li>';
   }
   function openInbox() { renderInbox(); $('inbox-sheet').hidden = false; $('inbox-sheet').scrollTop = 0; }
   $('btn-inbox').addEventListener('click', openInbox);
@@ -5492,7 +5497,7 @@ section.tab-anim > div > *:nth-child(n+7) { animation-delay: 300ms; }
   const msgsOf = un => db.collection('rt_chats/' + pairId(acct.un, un) + '/msgs');
   function openChat(un) {
     if (!acct || !db || !UN_RE.test(un)) return;
-    if (!friendIds().includes(un)) { toast('Sadece arkadaşlarınla mesajlaşabilirsin'); return; }
+    if (un === acct.un || blockedSet.has(un)) return;
     closeChat();
     chatWith = un; chatMsgs = [];
     renderChatHead();
@@ -5532,7 +5537,7 @@ section.tab-anim > div > *:nth-child(n+7) { animation-delay: 300ms; }
     e.preventDefault();
     const text = $('ch-in').value.trim().slice(0, 500), un = chatWith;
     if (!text || !un || !acct) return;
-    if (!friendIds().includes(un)) { toast('Artık arkadaş değilsiniz, mesaj gönderilemez'); return; }
+    if (blockedSet.has(un)) { toast('Engellediğin kişiye mesaj gönderilemez'); return; }
     const msg = { from: acct.un, text, at: Date.now() };
     $('ch-in').value = '';
     $('chat-sheet').scrollTop = $('chat-sheet').scrollHeight;
@@ -5595,9 +5600,9 @@ section.tab-anim > div > *:nth-child(n+7) { animation-delay: 300ms; }
     $('us-like').textContent = mt ? '👋 Birbirinizi beğendiniz · Mesaj yaz' : on ? '💖 Beğendin · geri al' : '🤍 Profili beğen';
     $('us-act').innerHTML = friend
       ? `<button class="btn btn-water" data-fr-chat="${n}">💬 Mesaj yaz</button><button class="btn btn-ghost" data-poke="${n}">👟 Dürt</button><button class="lg-guest us-unfriend" data-fr-del="${n}">Arkadaşlıktan çıkar</button>`
-      : !l ? `<button class="btn btn-water" data-fr-req="${n}">➕ Arkadaş ekle</button>`
-      : l.from === acct.un ? `<button class="btn btn-ghost" disabled>⏳ İstek gönderildi</button><button class="btn btn-ghost" data-fr-del="${n}">Geri al</button>`
-      : `<button class="btn btn-water" data-fr-ok="${n}">✅ Kabul et</button><button class="btn btn-ghost" data-fr-del="${n}">Reddet</button>`;
+      : !l ? `<button class="btn btn-water" data-fr-chat="${n}">💬 Mesaj yaz</button><button class="btn btn-ghost" data-fr-req="${n}">➕ Arkadaş ekle</button>`
+      : l.from === acct.un ? `<button class="btn btn-water" data-fr-chat="${n}">💬 Mesaj yaz</button><button class="btn btn-ghost" disabled>⏳ İstek gönderildi</button><button class="btn btn-ghost" data-fr-del="${n}">Geri al</button>`
+      : `<button class="btn btn-water" data-fr-chat="${n}">💬 Mesaj yaz</button><button class="btn btn-water" data-fr-ok="${n}">✅ Kabul et</button><button class="btn btn-ghost" data-fr-del="${n}">Reddet</button>`;
   }
   $('us-close').addEventListener('click', () => { $('user-sheet').hidden = true; viewing = ''; });
   // Announcement from the admin panel: the newest active one, as a card on Today (guests too); closing it hides that one for good
@@ -6094,23 +6099,52 @@ section.tab-anim > div > *:nth-child(n+7) { animation-delay: 300ms; }
   function stopSensor() { removeEventListener('devicemotion', onMotion); sensorOn = false; }
   // Phone app: the hardware counter is a running total since the phone started, and it keeps counting while the
   // app is closed. Each reading adds the steps since the previous one to today; after a restart the total begins at 0.
-  let stepListen = false;
+  // With Play services' Recording API (hist.since) the steps walked while the app was closed come from its day-by-day
+  // history instead, so a reading after a long gap only moves the baseline: the hardware total cannot tell which day they were.
+  let stepListen = false, hist = null;
+  const GAP_MS = 10 * 60000;
+  function addSteps(t, add) {
+    const before = t.steps;
+    t.steps += add;
+    if (t === S.days[dk(new Date())]) {
+      renderSteps();
+      if (before < S.goals.steps && t.steps >= S.goals.steps) toast('🎉 Adım hedefin tamam!', 2600);
+    }
+  }
   function onRaw(r) {
-    const raw = Math.round(+(r && r.steps)), boot = Math.round(+(r && r.bootAt) / 60000);
+    const raw = Math.round(+(r && r.steps)), boot = Math.round(+(r && r.bootAt) / 60000), now = Date.now();
     if (!(raw >= 0)) return;
     const prev = S.stepSrc;
     let add = 0;
     if (prev) {
       const sameBoot = Math.abs(boot - prev.boot) <= 2;
       add = !sameBoot ? raw : raw >= prev.raw ? raw - prev.raw : 0;
+      // Older readings carry no time; one taken before recording began still counts the old way, once
+      if (hist && prev.at && prev.at >= hist.since && now - prev.at > GAP_MS) add = 0;
     }
-    S.stepSrc = { raw, boot };
-    if (add > 0 && add < 100000) {
-      const t = today(), before = t.steps;
-      t.steps += add; renderSteps();
-      if (before < S.goals.steps && t.steps >= S.goals.steps) toast('🎉 Adım hedefin tamam!', 2600);
-    }
+    S.stepSrc = { raw, boot, at: now };
+    if (add > 0 && add < 100000) addSteps(today(), add);
     save();
+  }
+  // A day never goes down: the history can lag a few minutes behind the live count while the app is open
+  async function syncHistory() {
+    try {
+      const h = await SC('history', { days: 10 });
+      if (!h.available) { hist = null; return; }
+      hist = { since: +h.since || 0 };
+      const tk = dk(new Date());
+      Object.entries(h.days || {}).forEach(([k, n]) => {
+        if (k > tk || !(n > 0)) return;
+        const d = k === tk ? today() : S.days[k] || (S.days[k] = { steps: 0, water: [] });
+        if (real(d) && n > d.steps) addSteps(d, n - d.steps);
+      });
+      renderSteps(); save();
+    } catch (e) { console.warn('history', e && e.message); }
+  }
+  // The goal is kept on the phone too, for the "Adım hedefin tamam" notification while the app is closed
+  function saveStepGoal() {
+    if (!CAP || !sensorOn) return;
+    SC('setGoal', { goal: S.goals.steps, reached: today().steps >= S.goals.steps }).catch(() => {});
   }
   async function startNativeSteps(ask) {
     try {
@@ -6121,12 +6155,20 @@ section.tab-anim > div > *:nth-child(n+7) { animation-delay: 300ms; }
         s = await SC('requestPermission');
         if (!s.granted) { setSensor('denied'); return; }
       }
+      // The history comes first, so the reading right after it knows whether to count a long gap itself
+      await syncHistory();
       if (!stepListen) { stepListen = true; CAP.addListener('StepCounter', 'step', onRaw); }
       onRaw(await SC('start'));
       sensorOn = true; setSensor('on');
+      saveStepGoal();
     } catch (e) { console.warn('steps', e && e.message); setSensor('none'); }
   }
-  document.addEventListener('visibilitychange', () => { if (CAP && sensorOn && document.visibilityState === 'visible') SC('read').then(onRaw).catch(() => {}); });
+  document.addEventListener('visibilitychange', () => {
+    if (!CAP || !sensorOn) return;
+    if (document.visibilityState === 'visible') syncHistory().then(() => SC('read')).then(onRaw).catch(() => {});
+    else saveStepGoal();
+  });
+  setInterval(() => { if (CAP && sensorOn && document.visibilityState === 'visible') syncHistory(); }, GAP_MS);
 
   // Ads in the phone app. The banner is a native view drawn over the page, just above the tab bar,
   // so it steps aside whenever a full-screen sheet is open, and VIP members never see it.
@@ -6227,16 +6269,20 @@ section.tab-anim > div > *:nth-child(n+7) { animation-delay: 300ms; }
     const goalName = p && p.goal ? (p.goal === 'other' && p.goalText ? p.goalText : GOALS[p.goal].name) : null;
     $('p-note').textContent = p ? `${p.name ? 'Adın: ' + p.name + '. ' : ''}${goalName ? 'Ana hedefin: ' + goalName + '. ' : ''}Adım uzunluğun ${S.stride} cm. Bilgilerini değiştirirsen su hedefin yeniden hesaplanır.` : '';
     $('btn-clear-sample').hidden = !Object.values(S.days).some(d => d.sample) && !S.sleep.log.some(l => l.sample);
+    renderWear();
+    renderWaterRemind();
+  }
+  // The water reminder sits in the Su ekle card on Today
+  function renderWaterRemind() {
     const wr = waterCfg();
     $('sw-water').checked = wr.on; $('in-every').value = wr.every; $('in-every').disabled = !wr.on;
-    renderWear();
     $('water-window').textContent = `Son suyundan ${fmtDur(wr.every)} sonra haber veririz. Kalkıştan 30 dk sonra başlar, yatmadan 1 saat önce biter (${fromMin(toMin(S.sleep.wake) + 30)}–${fromMin(toMin(S.sleep.bed) - 60)}). Su hedefini tamamlayınca susar.`;
   }
   $('sw-water').addEventListener('change', e => {
-    waterCfg().on = e.target.checked; save(); renderSettings(); syncNative();
+    waterCfg().on = e.target.checked; save(); renderWaterRemind(); syncNative();
     if (e.target.checked) { askAlarmPermission(); toast('💧 Su hatırlatıcısı açıldı'); } else toast('Su hatırlatıcısı kapatıldı');
   });
-  $('in-every').addEventListener('change', e => { waterCfg().every = +e.target.value; save(); renderSettings(); syncNative(); toast('Hatırlatma sıklığı kaydedildi'); });
+  $('in-every').addEventListener('change', e => { waterCfg().every = +e.target.value; save(); renderWaterRemind(); syncNative(); toast('Hatırlatma sıklığı kaydedildi'); });
   const clampNum = (v, lo, hi) => { const n = Math.round(+v); return isFinite(n) && n >= lo && n <= hi ? n : null; };
   $('in-steps').addEventListener('change', e => { const n = clampNum(e.target.value, 500, 100000); if (n) { S.goals.steps = n; if (S.profile) S.profile.target = 'own'; save(); toast('Adım hedefi kaydedildi'); } renderSettings(); });
   $('set-diff').addEventListener('click', e => {
@@ -7555,7 +7601,7 @@ section.tab-anim > div > *:nth-child(n+7) { animation-delay: 300ms; }
   }
   function renderWaterNudge() {
     const wr = waterCfg(), el = $('water-nudge'), at = nextWaterNudge(), now = Date.now();
-    if (!wr.on) el.textContent = '🔕 Su hatırlatıcısı kapalı. Ayarlar sekmesinden açabilirsin.';
+    if (!wr.on) el.textContent = '🔕 Su hatırlatıcısı kapalı. Ana sayfadaki Su ekle kartından açabilirsin.';
     else if (waterOf(today()) >= waterGoal()) el.textContent = '🔔 Hedef tamam, bugün başka hatırlatma yok.';
     else if (!at) el.textContent = `🔔 Hatırlatmalar yarın saat ${fromMin(toMin(S.sleep.wake) + 30)} itibarıyla başlar.`;
     else if (at <= now) el.textContent = '💧 Bir bardak içme vakti geldi!';
