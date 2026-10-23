@@ -6152,6 +6152,7 @@ section.tab-anim > div > *:nth-child(n+7) { animation-delay: 300ms; }
       if (!s.available) { setSensor('none'); return; }
       if (!s.granted) {
         if (!ask) { setSensor('off'); return; }
+        S.stepAsked = true; save();
         s = await SC('requestPermission');
         if (!s.granted) { setSensor('denied'); return; }
       }
@@ -6164,6 +6165,8 @@ section.tab-anim > div > *:nth-child(n+7) { animation-delay: 300ms; }
     } catch (e) { console.warn('steps', e && e.message); setSensor('none'); }
   }
   document.addEventListener('visibilitychange', () => {
+    // Back from the phone settings with the permission now on: the counter starts by itself
+    if (CAP && !sensorOn && S.profile && document.visibilityState === 'visible') { startNativeSteps(false); return; }
     if (!CAP || !sensorOn) return;
     if (document.visibilityState === 'visible') syncHistory().then(() => SC('read')).then(onRaw).catch(() => {});
     else saveStepGoal();
@@ -7358,7 +7361,7 @@ section.tab-anim > div > *:nth-child(n+7) { animation-delay: 300ms; }
   }
   async function askPerm(id) {
     if (id === 'notif') return askNotifications();
-    if (id === 'steps') { if (CAP) { try { await SC('requestPermission'); } catch (e) {} } else startSensor(); return; }
+    if (id === 'steps') { if (CAP) await startNativeSteps(true); else startSensor(); return; }
     if (id === 'loc') return loadWx(true);
     if (id === 'alarm' && CAP) return ln('changeExactNotificationSetting').catch(() => {});
   }
@@ -7422,7 +7425,7 @@ section.tab-anim > div > *:nth-child(n+7) { animation-delay: 300ms; }
       const btn = $('ob-next'); btn.disabled = true;
       (async () => {
         const granted = (await permState('notif')) || (await askNotifications());
-        if (CAP && !(await permState('steps'))) { try { await SC('requestPermission'); } catch (e) {} }
+        if (CAP && !(await permState('steps'))) { S.stepAsked = true; try { await SC('requestPermission'); } catch (e) {} }
         if (!(await permState('loc'))) loadWx(false);
         btn.disabled = false;
         finishOnboard(true, granted, !CAP);
@@ -8449,8 +8452,8 @@ section.tab-anim > div > *:nth-child(n+7) { animation-delay: 300ms; }
     el.addEventListener('click', end);
     setTimeout(end, matchMedia('(prefers-reduced-motion: reduce)').matches ? 1200 : vip ? 3600 : 3000);
   })();
-  // Count from the phone's sensor right away when permission was given before
-  if (CAP && S.profile) startNativeSteps(false);
+  // Count from the phone's sensor right away; the permission is asked by itself once, if it never was
+  if (CAP && S.profile) startNativeSteps(!S.stepAsked);
 })();
 </script>
 
