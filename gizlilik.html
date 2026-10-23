@@ -41,13 +41,13 @@ a { color: var(--acc); }
 <ul>
   <li><b>Hesap bilgileri:</b> kullanıcı adın, adın, şifrenin geri çevrilemez şekilde şifrelenmiş (hash) hâli ve eklediysen e-posta adresin</li>
   <li><b>Herkese açık profil kartın:</b> adın, emojin, seviyen, rozetlerin, en uzun serin ve bu haftaki toplam adım sayın, bu hafta uygulamada geçirdiğin süre ("En aktif" sıralaması için) ve sanal evcil dostunun türü, adı ve büyümesi ("Dostlar" sıralaması için). "Herkes görsün" seçersen biyografin ve fotoğrafın da kartında görünür.</li>
-  <li><b>Sosyal özellikler:</b> arkadaşlıkların, arkadaşlarınla yazıştığın mesajlar, beğeniler, dürtmeler, davetler ve katıldığın grup meydan okumaları</li>
+  <li><b>Sosyal özellikler:</b> arkadaşlıkların, diğer kayıtlı kullanıcılarla yazıştığın mesajlar, beğeniler, dürtmeler, davetler ve katıldığın grup meydan okumaları</li>
 </ul>
 <p>Sunucumuz <b>Supabase</b> altyapısında, Avrupa Birliği içinde (<b>Frankfurt, Almanya</b>) çalışır. Bağlantılar şifrelidir (HTTPS).</p>
 
 <h2>3. İzinler ve neden istendikleri</h2>
 <ul>
-  <li><b>Fiziksel aktivite (adım sayar):</b> Telefonunun hareket sensöründen adımlarını saymak için. Sayım telefonunda yapılır.</li>
+  <li><b>Fiziksel aktivite (adım sayar):</b> Telefonunun hareket sensöründen adımlarını saymak için. Sayım telefonunda yapılır. Telefonunda Google Play hizmetleri varsa, uygulama kapalıyken attığın adımlar doğru güne yazılsın diye Google Play hizmetlerinin cihaz içi adım kaydı (Recording API) da kullanılır; bu kayıt telefonunda tutulur, Google hesabı gerektirmez ve bize gönderilmez.</li>
   <li><b>Konum:</b> Yalnızca ana ekrandaki hava durumu için. Yaklaşık konumun (yaklaşık 100 metre hassasiyetle) hava durumunu ve şehir adını öğrenmek için Open-Meteo ve BigDataCloud servislerine gönderilir. Konumun sunucumuzda saklanmaz. Konum iznini vermezsen hava durumu, IP adresinden çıkarılan yaklaşık şehir konumuna göre gösterilir; bunun için IP adresin BigDataCloud servisine iletilir. Konum izni vermemen uygulamanın geri kalanını etkilemez.</li>
   <li><b>Bildirimler ve alarmlar:</b> Su hatırlatmaları, yatma saati hatırlatmaları ve uyandırma alarmları için. Bunlar telefonunda kurulur.</li>
 </ul>
@@ -58,7 +58,7 @@ a { color: var(--acc); }
 <h2>5. Bilgilerin kimlerle paylaşılır</h2>
 <ul>
   <li><b>Arkadaşların ve diğer kullanıcılar:</b> Yalnızca yukarıda anlatılan profil kartın; mesajlarını sadece yazıştığın kişi görür.</li>
-  <li><b>Hizmet sağlayıcılarımız:</b> Supabase (sunucu ve hesaplar), Google AdMob (reklamlar), Gmail (şifre sıfırlama e-postaları), Open-Meteo ve BigDataCloud (hava durumu).</li>
+  <li><b>Hizmet sağlayıcılarımız:</b> Supabase (sunucu ve hesaplar), Google AdMob (reklamlar), Google Play hizmetleri (cihaz içi adım kaydı), Gmail (şifre sıfırlama e-postaları), Open-Meteo ve BigDataCloud (hava durumu).</li>
 </ul>
 <p>Bilgilerini <b>satmayız</b>.</p>
 
